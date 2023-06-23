@@ -119,6 +119,12 @@ impl Identity {
             .get(0)
             .ok_or_else(|| Error(base::Error::from(errSecParam)))?;
         let ident = SecIdentity::with_certificate(&[keychain], cert)?;
+
+        if items.certificates.len() > 1 {
+            // Don't include the leaf cert in the intermediate chain if there is one
+            items.certificates.remove(0);
+        }
+
         Ok(Identity {
             identity: ident,
             chain: items.certificates,
